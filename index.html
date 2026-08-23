@@ -413,21 +413,21 @@
   #fab svg{width:26px;height:26px;}
 
   /* ---------- Keypad modal ---------- */
-  #keypad-overlay, #addex-overlay, #theme-overlay, #timer-overlay, #ai-overlay, #memo-overlay{
+  #keypad-overlay, #addex-overlay, #theme-overlay, #timer-overlay, #ai-overlay, #memo-overlay, #finish-overlay{
     position:absolute; inset:0; background:rgba(8,8,10,0.72);
     display:none; align-items:flex-end; z-index:100;
     backdrop-filter:blur(2px);
   }
   #keypad-overlay{ z-index:110; }
-  #keypad-overlay.show, #addex-overlay.show, #theme-overlay.show, #timer-overlay.show, #ai-overlay.show, #memo-overlay.show{display:flex;}
-  #keypad-sheet, #addex-sheet, #theme-sheet, #timer-sheet, #ai-sheet, #memo-sheet{
+  #keypad-overlay.show, #addex-overlay.show, #theme-overlay.show, #timer-overlay.show, #ai-overlay.show, #memo-overlay.show, #finish-overlay.show{display:flex;}
+  #keypad-sheet, #addex-sheet, #theme-sheet, #timer-sheet, #ai-sheet, #memo-sheet, #finish-sheet{
     width:100%; background:var(--surface); border-radius:26px 26px 0 0;
     padding:20px 20px calc(20px + var(--safe-bottom) + var(--ad-clearance));
     border-top:1px solid var(--line);
     animation:slideup 0.18s ease-out;
     max-height:82%; overflow-y:auto;
   }
-  #addex-sheet h2, #day-sheet h2, #theme-sheet h2, #timer-sheet h2, #ai-sheet h2, #memo-sheet h2{font-family:'Bebas Neue',sans-serif; font-size:22px; margin:0 0 16px; letter-spacing:0.03em; color:var(--text);}
+  #addex-sheet h2, #day-sheet h2, #theme-sheet h2, #timer-sheet h2, #ai-sheet h2, #memo-sheet h2, #finish-sheet h2{font-family:'Bebas Neue',sans-serif; font-size:22px; margin:0 0 16px; letter-spacing:0.03em; color:var(--text);}
   .field-label{font-size:12px; color:var(--text-dim); font-weight:700; letter-spacing:0.05em; text-transform:uppercase; margin:0 2px 8px;}
   .text-input{
     width:100%; background:var(--surface-2); border:1px solid var(--line); border-radius:14px;
@@ -517,6 +517,19 @@
   }
   .ai-app-btn:active{background:var(--surface-3);}
   .ai-note{font-size:11.5px; color:var(--text-dim); line-height:1.6; margin-top:14px;}
+  .finish-entry-btn{
+    width:100%; padding:15px; border-radius:16px; border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#1a0d08;
+    font-weight:800; font-size:14.5px; margin-top:6px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .finish-entry-btn:active{opacity:0.85;}
+  .finish-summary-card{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:16px;
+    padding:16px; margin-bottom:18px; font-size:14px; line-height:1.9; color:var(--text);
+    white-space:pre-line;
+  }
+  .finish-loading{text-align:center; color:var(--text-dim); font-size:13px; padding:20px 0;}
   .freeform-field-row{
     display:flex; align-items:center; gap:10px;
     background:var(--surface-3); border-radius:12px; padding:10px 12px; margin-bottom:8px;
@@ -736,6 +749,10 @@
 
   <div id="memo-overlay">
     <div id="memo-sheet"></div>
+  </div>
+
+  <div id="finish-overlay">
+    <div id="finish-sheet"></div>
   </div>
 
   <div id="alarm-flash-overlay">
@@ -2353,8 +2370,9 @@ function clearAiPhoto(){
   if(aiShareState.photoUrl){ URL.revokeObjectURL(aiShareState.photoUrl); aiShareState.photoUrl = null; }
 }
 
-function openAiShareModal(){
+function openAiShareModal(initialPrompt){
   clearAiPhoto();
+  aiShareState.customPrompt = initialPrompt || null;
   $aiOverlay.classList.add('show');
   renderAiShareModal();
 }
@@ -2364,7 +2382,7 @@ function closeAiShareModal(){
 }
 
 function renderAiShareModal(){
-  const defaultPrompt = 'このジム器具・動作の名前（トレーニング種目名）を教えてください。';
+  const defaultPrompt = aiShareState.customPrompt || 'このジム器具・動作の名前（トレーニング種目名）を教えてください。';
   const android = isAndroidDevice();
 
   $aiSheet.innerHTML = `
@@ -2563,6 +2581,12 @@ function renderDayDetail(){
         ${ent.sets.map((s,si)=>renderSetRowHtml(fields, s, i, si)).join('')}
       </div>
     `;}).join('') : `<div class="empty-hint">この日の記録はありません</div>`}
+    ${entries.length ? `
+      <button class="finish-entry-btn" id="finish-workout-btn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4"/><path d="M4 5l14 3-14 3"/></svg>
+        トレーニング終了
+      </button>
+    ` : ''}
   `;
 
   async function persistEntries(){
@@ -2591,6 +2615,8 @@ function renderDayDetail(){
     state.view = 'bodypart';
     render();
   };
+  const $finishBtn = document.getElementById('finish-workout-btn');
+  if($finishBtn) $finishBtn.onclick = openFinishSummaryModal;
 
   $daySheet.querySelectorAll('.reorder-btn[data-act="up"]').forEach(el=>{
     el.onclick = async ()=>{
@@ -2774,6 +2800,119 @@ function setupMergeDragHandlers(){
     });
   });
 }
+
+/* ============================= WORKOUT FINISH SUMMARY ============================= */
+/* Note: this is a locally-computed, data-aware summary generator — not a call to an
+   external AI model (this app has no server and no API key, by design, so it can run
+   entirely on GitHub Pages). For a genuine AI-written response, the summary can be
+   shared out to an installed AI app via the existing "AIに種目を聞く" share flow. */
+
+const $finishOverlay = document.getElementById('finish-overlay');
+const $finishSheet = document.getElementById('finish-sheet');
+
+const FINISH_OPENERS = ['お疲れさまでした！','よく頑張りました！','ナイストレーニングでした！','今日もお疲れさまです！','しっかりやり切りましたね！'];
+const FINISH_CLOSERS = [
+  'この調子で積み重ねていきましょう。',
+  '継続は力なり、確実に力になっています。',
+  '明日の自分がきっと感謝してくれます。',
+  '焦らず、着実に。とてもいいペースです。',
+  '休息もトレーニングのうち。しっかり回復させてくださいね。',
+];
+function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function computeStreakEndingAt(dateStr){
+  let streak = 0;
+  const cursor = new Date(dateStr + 'T00:00:00');
+  while(true){
+    const ds = cursor.getFullYear() + '-' + String(cursor.getMonth()+1).padStart(2,'0') + '-' + String(cursor.getDate()).padStart(2,'0');
+    if(state.logDates.has(ds)){ streak++; cursor.setDate(cursor.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+async function findTodaysPRs(dateStr, entries){
+  const prs = [];
+  const strengthEntries = entries.filter(ent=>{
+    const f = ent.fields || DEFAULT_FIELDS;
+    return f.length===2 && f[0].key==='weight' && f[1].key==='reps' && ent.sets.length;
+  });
+  if(!strengthEntries.length) return prs;
+
+  // Cache each other day's log for the duration of this scan so repeated exercise
+  // names in today's list don't re-fetch the same days from IndexedDB.
+  const otherDates = [...state.logDates].filter(d=>d!==dateStr);
+  const logsByDate = {};
+  for(const d of otherDates){ logsByDate[d] = await loadDayLog(d); }
+
+  for(const ent of strengthEntries){
+    const todayMax = Math.max(...ent.sets.map(s=>s.weight||0));
+    let historicalMax = 0;
+    for(const d of otherDates){
+      (logsByDate[d]||[]).forEach(e=>{
+        if(e.name !== ent.name) return;
+        const f = e.fields || DEFAULT_FIELDS;
+        if(f.length===2 && f[0].key==='weight' && f[1].key==='reps'){
+          e.sets.forEach(s=>{ if((s.weight||0) > historicalMax) historicalMax = s.weight; });
+        }
+      });
+    }
+    if(todayMax > historicalMax){ prs.push({ name: ent.name, weight: todayMax }); }
+  }
+  return prs;
+}
+
+async function buildWorkoutSummary(){
+  const date = state.dayDetailDate;
+  const entries = state.dayDetailEntries || [];
+  const exCount = entries.length;
+  const setCount = entries.reduce((sum,e)=>sum + e.sets.length, 0);
+  const parts = [...new Set(entries.map(e=>e.bodyPartLabel).filter(Boolean))];
+
+  let totalVolume = 0;
+  entries.forEach(e=>{
+    const f = e.fields || DEFAULT_FIELDS;
+    if(f.length===2 && f[0].key==='weight' && f[1].key==='reps'){
+      e.sets.forEach(s=>{ totalVolume += (s.weight||0) * (s.reps||0); });
+    }
+  });
+
+  const streak = computeStreakEndingAt(date);
+  const prs = await findTodaysPRs(date, entries);
+
+  const lines = [];
+  lines.push(pickRandom(FINISH_OPENERS));
+  lines.push(`${fmtDate(date)}は${parts.length ? parts.join('・') : 'トレーニング'}を中心に、${exCount}種目・${setCount}セットをこなしました。`);
+  if(totalVolume > 0) lines.push(`総ボリューム（重量×repsの合計）は約${Math.round(totalVolume).toLocaleString()}kgでした。`);
+  if(prs.length) lines.push(`🎉 ${prs.map(p=>`${p.name}で自己ベスト更新（${p.weight}kg）`).join('、')}！素晴らしい進歩です。`);
+  if(streak >= 2) lines.push(`これで${streak}日連続の記録です。この継続力、本当にすごいです。`);
+  lines.push(pickRandom(FINISH_CLOSERS));
+  return lines.join('\n');
+}
+
+async function openFinishSummaryModal(){
+  $finishOverlay.classList.add('show');
+  $finishSheet.innerHTML = `
+    <div class="handle"></div>
+    <h2>🏁 今日の振り返り</h2>
+    <div class="finish-loading">分析中…</div>
+  `;
+  const summary = await buildWorkoutSummary();
+  $finishSheet.innerHTML = `
+    <div class="handle"></div>
+    <h2>🏁 今日の振り返り</h2>
+    <div class="finish-summary-card">${summary}</div>
+    <button class="primary-btn" id="finish-share-ai-btn">AIアプリにも見てもらう</button>
+    <button class="ghost-btn" id="finish-close-btn">閉じる</button>
+    <div class="ai-note">この振り返りは、記録データをもとにアプリ内で自動生成したものです（外部AIへの通信は行っていません）。実際のAIアプリにも見てもらいたい場合は上のボタンからどうぞ。</div>
+  `;
+  document.getElementById('finish-close-btn').onclick = ()=>{ $finishOverlay.classList.remove('show'); };
+  document.getElementById('finish-share-ai-btn').onclick = ()=>{
+    $finishOverlay.classList.remove('show');
+    openAiShareModal(summary + '\n\n今日のトレーニング内容について、ポジティブなコメントをください。');
+  };
+}
+$finishOverlay.addEventListener('click', (e)=>{ if(e.target===$finishOverlay) $finishOverlay.classList.remove('show'); });
 
 /* ============================= MAIN RENDER SWITCH ============================= */
 
