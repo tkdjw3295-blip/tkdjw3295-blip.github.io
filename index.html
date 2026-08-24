@@ -2905,9 +2905,7 @@ function statsToPromptText(dateStr, entries, stats){
 
 function buildAiSharePrompt(dateStr, entries, stats){
   return statsToPromptText(dateStr, entries, stats)
-    + '\n\n上記は今日のトレーニング記録です。この内容を踏まえて、以下2点をお願いします。\n'
-    + '①ポジティブなコメントをください。\n'
-    + '②今日の内容を踏まえて、明日行うと良いトレーニングメニューも提案してください。';
+    + '\n\n今日の内容を踏まえて、明日行うと良いトレーニングメニューを提案してください。';
 }
 
 function openFinishWorkoutGate(){
