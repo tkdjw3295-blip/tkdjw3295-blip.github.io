@@ -50,6 +50,10 @@
   #phone[data-theme="light"] #session-bar .count{ color:#FFFFFF; }
   #phone[data-theme="light"] .kp-key.confirm{ color:#FFFFFF; }
   #phone[data-theme="light"] .cal-cell{ border:1px solid var(--line); }
+  #phone[data-theme="light"] .cal-cell.today{
+    border-width:2px; border-color:var(--accent);
+    background:color-mix(in srgb, var(--accent) 85%, black);
+  }
   #phone[data-theme="light"] .set-row, #phone[data-theme="light"] .recent-item,
   #phone[data-theme="light"] .ex-tile, #phone[data-theme="light"] .day-ex-block,
   #phone[data-theme="light"] .input-box{ border-color:var(--line); }
@@ -146,6 +150,10 @@
   #phone[data-theme="colorful"] .cal-cell.has-log{ background: color-mix(in srgb, var(--accent) 16%, var(--surface)); }
   #phone[data-theme="colorful"] .cal-cell.has-log .plate-dot{ background: var(--accent); }
   #phone[data-theme="colorful"] .cal-cell{ border:1px solid var(--line); }
+  #phone[data-theme="colorful"] .cal-cell.today{
+    border-width:2px; border-color:var(--accent);
+    background:color-mix(in srgb, var(--accent) 85%, black);
+  }
   #phone[data-theme="colorful"] .recent-item .ic{ color:#000000; }
   #phone[data-theme="colorful"] .recent-item .name{ color:#000000; }
   #phone[data-theme="colorful"] .cal-cell:not(.today) .d{ color:#000000; }
@@ -235,8 +243,13 @@
   .cal-cell.empty{background:transparent; cursor:default;}
   .cal-cell .d{font-size:14px; font-weight:600; color:var(--text-dim);}
   .cal-cell.has-log .d{color:var(--text);}
-  .cal-cell.today{border-color:var(--accent);}
-  .cal-cell.today .d{color:var(--accent-2);}
+  .cal-cell.today{
+    border-width:2px; border-color:var(--accent);
+    background:color-mix(in srgb, var(--accent) 85%, black);
+    box-shadow:0 4px 14px rgba(0,0,0,0.28);
+  }
+  .cal-cell.today .d{color:#FFFFFF; font-weight:800;}
+  .cal-cell.today .plates .plate-dot{background:#FFFFFF;}
   .cal-cell .plates{position:absolute; bottom:6px; display:flex; gap:2px;}
   .cal-cell .plate-dot{width:5px;height:5px;border-radius:50%; background:var(--accent);}
   .cal-cell:active{background:var(--surface-2);}
@@ -2616,7 +2629,7 @@ function renderDayDetail(){
     render();
   };
   const $finishBtn = document.getElementById('finish-workout-btn');
-  if($finishBtn) $finishBtn.onclick = openFinishSummaryModal;
+  if($finishBtn) $finishBtn.onclick = openFinishWorkoutGate;
 
   $daySheet.querySelectorAll('.reorder-btn[data-act="up"]').forEach(el=>{
     el.onclick = async ()=>{
@@ -2801,24 +2814,15 @@ function setupMergeDragHandlers(){
   });
 }
 
-/* ============================= WORKOUT FINISH SUMMARY ============================= */
-/* Note: this is a locally-computed, data-aware summary generator — not a call to an
-   external AI model (this app has no server and no API key, by design, so it can run
-   entirely on GitHub Pages). For a genuine AI-written response, the summary can be
-   shared out to an installed AI app via the existing "AIに種目を聞く" share flow. */
+/* ============================= WORKOUT FINISH: ASK AI OR REST ============================= */
+/* This app has no server and no API key by design (it runs as a static site on GitHub
+   Pages), so it can't call an AI model directly. Instead, tapping "はい" hands today's
+   stats to a real AI app via the OS share sheet (the same mechanism as "AIに種目を聞く") —
+   the instructional text is composed here and sent straight to the share sheet without
+   ever being shown on screen first. */
 
 const $finishOverlay = document.getElementById('finish-overlay');
 const $finishSheet = document.getElementById('finish-sheet');
-
-const FINISH_OPENERS = ['お疲れさまでした！','よく頑張りました！','ナイストレーニングでした！','今日もお疲れさまです！','しっかりやり切りましたね！'];
-const FINISH_CLOSERS = [
-  'この調子で積み重ねていきましょう。',
-  '継続は力なり、確実に力になっています。',
-  '明日の自分がきっと感謝してくれます。',
-  '焦らず、着実に。とてもいいペースです。',
-  '休息もトレーニングのうち。しっかり回復させてくださいね。',
-];
-function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
 function computeStreakEndingAt(dateStr){
   let streak = 0;
@@ -2862,13 +2866,10 @@ async function findTodaysPRs(dateStr, entries){
   return prs;
 }
 
-async function buildWorkoutSummary(){
-  const date = state.dayDetailDate;
-  const entries = state.dayDetailEntries || [];
+async function computeWorkoutStats(dateStr, entries){
   const exCount = entries.length;
   const setCount = entries.reduce((sum,e)=>sum + e.sets.length, 0);
   const parts = [...new Set(entries.map(e=>e.bodyPartLabel).filter(Boolean))];
-
   let totalVolume = 0;
   entries.forEach(e=>{
     const f = e.fields || DEFAULT_FIELDS;
@@ -2876,40 +2877,72 @@ async function buildWorkoutSummary(){
       e.sets.forEach(s=>{ totalVolume += (s.weight||0) * (s.reps||0); });
     }
   });
+  const streak = computeStreakEndingAt(dateStr);
+  const prs = await findTodaysPRs(dateStr, entries);
+  return { exCount, setCount, parts, totalVolume, streak, prs };
+}
 
-  const streak = computeStreakEndingAt(date);
-  const prs = await findTodaysPRs(date, entries);
-
+/** Plain factual description of today's training — no fake enthusiasm, just the data,
+ *  since a real AI will supply the tone once it receives this. */
+function statsToPromptText(dateStr, entries, stats){
   const lines = [];
-  lines.push(pickRandom(FINISH_OPENERS));
-  lines.push(`${fmtDate(date)}は${parts.length ? parts.join('・') : 'トレーニング'}を中心に、${exCount}種目・${setCount}セットをこなしました。`);
-  if(totalVolume > 0) lines.push(`総ボリューム（重量×repsの合計）は約${Math.round(totalVolume).toLocaleString()}kgでした。`);
-  if(prs.length) lines.push(`🎉 ${prs.map(p=>`${p.name}で自己ベスト更新（${p.weight}kg）`).join('、')}！素晴らしい進歩です。`);
-  if(streak >= 2) lines.push(`これで${streak}日連続の記録です。この継続力、本当にすごいです。`);
-  lines.push(pickRandom(FINISH_CLOSERS));
+  lines.push(`${fmtDate(dateStr)}のトレーニング記録です。`);
+  lines.push(`部位：${stats.parts.length ? stats.parts.join('・') : '記載なし'}`);
+  lines.push(`種目数：${stats.exCount}種目、セット数：${stats.setCount}セット`);
+  entries.forEach(e=>{
+    const f = e.fields || DEFAULT_FIELDS;
+    const setsStr = e.sets.map(s=>{
+      if(f.length===2 && f[0].key==='weight' && f[1].key==='reps') return `${s.weight}kg×${s.reps}reps`;
+      return f.map(ff=>`${s[ff.key]}${ff.unit||''}`).join(' ');
+    }).join('、');
+    lines.push(`・${e.name}：${setsStr}`);
+  });
+  if(stats.totalVolume > 0) lines.push(`総ボリューム：約${Math.round(stats.totalVolume).toLocaleString()}kg`);
+  if(stats.prs.length) lines.push(`自己ベスト更新：${stats.prs.map(p=>`${p.name} ${p.weight}kg`).join('、')}`);
+  if(stats.streak >= 2) lines.push(`連続記録日数：${stats.streak}日`);
   return lines.join('\n');
 }
 
-async function openFinishSummaryModal(){
+function buildAiSharePrompt(dateStr, entries, stats){
+  return statsToPromptText(dateStr, entries, stats)
+    + '\n\n上記は今日のトレーニング記録です。この内容を踏まえて、以下2点をお願いします。\n'
+    + '①ポジティブなコメントをください。\n'
+    + '②今日の内容を踏まえて、明日行うと良いトレーニングメニューも提案してください。';
+}
+
+function openFinishWorkoutGate(){
   $finishOverlay.classList.add('show');
   $finishSheet.innerHTML = `
     <div class="handle"></div>
-    <h2>🏁 今日の振り返り</h2>
-    <div class="finish-loading">分析中…</div>
+    <h2>トレーニング終了</h2>
+    <div class="finish-summary-card" style="text-align:center; font-weight:800; font-size:15.5px;">AIに今日の成果を見てもらいますか？</div>
+    <div style="display:flex; gap:10px; margin-top:4px;">
+      <button class="ghost-btn" id="finish-no-btn" style="flex:1; margin-top:0;">いいえ</button>
+      <button class="primary-btn" id="finish-yes-btn" style="flex:1; margin-top:0;">はい</button>
+    </div>
   `;
-  const summary = await buildWorkoutSummary();
-  $finishSheet.innerHTML = `
-    <div class="handle"></div>
-    <h2>🏁 今日の振り返り</h2>
-    <div class="finish-summary-card">${summary}</div>
-    <button class="primary-btn" id="finish-share-ai-btn">AIアプリにも見てもらう</button>
-    <button class="ghost-btn" id="finish-close-btn">閉じる</button>
-    <div class="ai-note">この振り返りは、記録データをもとにアプリ内で自動生成したものです（外部AIへの通信は行っていません）。実際のAIアプリにも見てもらいたい場合は上のボタンからどうぞ。</div>
-  `;
-  document.getElementById('finish-close-btn').onclick = ()=>{ $finishOverlay.classList.remove('show'); };
-  document.getElementById('finish-share-ai-btn').onclick = ()=>{
+  document.getElementById('finish-no-btn').onclick = ()=>{
+    $finishSheet.innerHTML = `
+      <div class="handle"></div>
+      <h2>お疲れさまでした</h2>
+      <div class="finish-summary-card" style="text-align:center;">お疲れさまでした。<br>しっかり休んでください。</div>
+      <button class="primary-btn" id="finish-rest-close-btn">閉じる</button>
+    `;
+    document.getElementById('finish-rest-close-btn').onclick = ()=>{ $finishOverlay.classList.remove('show'); };
+  };
+  document.getElementById('finish-yes-btn').onclick = async ()=>{
     $finishOverlay.classList.remove('show');
-    openAiShareModal(summary + '\n\n今日のトレーニング内容について、ポジティブなコメントをください。');
+    const date = state.dayDetailDate;
+    const entries = state.dayDetailEntries || [];
+    const stats = await computeWorkoutStats(date, entries);
+    const prompt = buildAiSharePrompt(date, entries, stats);
+    if(typeof navigator.share === 'function'){
+      await shareToDevice(prompt, null);
+    } else {
+      // No native share sheet on this device/browser — fall back to the in-app
+      // AI-share screen (Android intent buttons, editable text) as a backup path.
+      openAiShareModal(prompt);
+    }
   };
 }
 $finishOverlay.addEventListener('click', (e)=>{ if(e.target===$finishOverlay) $finishOverlay.classList.remove('show'); });
