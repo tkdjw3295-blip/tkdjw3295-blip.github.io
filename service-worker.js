@@ -2,7 +2,7 @@
 // Minimal app-shell cache for GitHub Pages. No server calls, no external APIs —
 // only same-origin static files are ever cached or fetched here.
 
-const CACHE_NAME = 'weight-training-log-v3.0';
+const CACHE_NAME = 'weight-training-log-v3.1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
