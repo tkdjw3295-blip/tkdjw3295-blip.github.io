@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#111217; --surface:#1B1D24; --surface-2:#242730;
+    --bg:#111217; --surface:#1B1D24; --surface-2:#242730; --surface-3:#2E313C;
     --accent:#FF5A36; --accent-2:#FFC93D;
     --text:#F2F1EC; --text-dim:#9AA0AA; --line:#33363F;
   }
@@ -31,13 +31,33 @@
   h2{font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.03em; margin:34px 0 12px; color:var(--accent-2);}
   p{font-size:15px; color:var(--text); margin:0 0 14px;}
   .card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:18px;}
-  .fill{color:var(--accent-2); font-weight:700;}
-  .btn{
-    display:inline-block; background:var(--accent); color:#1a0d08; font-weight:800;
-    padding:12px 20px; border-radius:12px; text-decoration:none; margin-top:8px;
-  }
-  footer{margin-top:50px; padding-top:20px; border-top:1px solid var(--line); font-size:12.5px; color:var(--text-dim);}
   a{color:var(--accent-2);}
+
+  .field-label{font-size:12.5px; color:var(--text-dim); font-weight:700; letter-spacing:0.04em; margin:0 2px 8px; text-transform:uppercase;}
+  .text-input, textarea.text-input{
+    width:100%; background:var(--surface-2); border:1px solid var(--line); border-radius:14px;
+    padding:13px 14px; font-size:15px; color:var(--text); font-family:'Inter',sans-serif;
+    margin-bottom:18px;
+  }
+  textarea.text-input{min-height:130px; resize:vertical;}
+  .text-input:focus{outline:none; border-color:var(--accent);}
+  .req{color:var(--accent);}
+
+  .primary-btn{
+    width:100%; padding:15px; border-radius:14px; border:none;
+    background:var(--accent); color:#1a0d08; font-weight:800; font-size:15px;
+    cursor:pointer;
+  }
+  .primary-btn:active{background:#e04c2b;}
+  .primary-btn:disabled{background:var(--surface-3); color:var(--text-dim); cursor:not-allowed;}
+
+  #contact-form{display:block;}
+  #success-card{display:none; text-align:center; padding:34px 20px;}
+  #success-card .icon{font-size:44px; margin-bottom:10px;}
+  #success-card h2{margin-top:0;}
+  #error-note{display:none; color:#FF8A7A; font-size:13px; margin-top:-8px; margin-bottom:14px;}
+
+  footer{margin-top:50px; padding-top:20px; border-top:1px solid var(--line); font-size:12.5px; color:var(--text-dim);}
 </style>
 </head>
 <body>
@@ -54,30 +74,100 @@
     <a href="./contact.html">お問い合わせ</a>
   </nav>
 
-  <h2>お問い合わせ</h2>
+  <h2 style="margin-top:0;">お問い合わせ</h2>
   <p>
-    IRON LOGに関するご質問、不具合のご報告、ご要望などがございましたら、以下の連絡先までお気軽にご連絡ください。
-    内容を確認のうえ、可能な範囲で対応いたします。
+    IRON LOGに関するご質問・不具合のご報告・ご要望など、お気軽にご連絡ください。
+    このフォームからの内容は運営者に届きます。返信が必要な場合はメールアドレスをご記入ください。
   </p>
 
   <div class="card">
-    <p>メールでのお問い合わせ：</p>
-    <a class="btn" href="mailto:[email protected]">[email protected] 宛にメールを送る</a>
+    <form id="contact-form">
+      <div class="field-label">お名前（任意）</div>
+      <input class="text-input" type="text" id="field-name" maxlength="60" placeholder="例：山田太郎">
+
+      <div class="field-label">メールアドレス（返信が必要な場合）</div>
+      <input class="text-input" type="email" id="field-email" maxlength="120" placeholder="例：[email protected]">
+
+      <div class="field-label">お問い合わせ内容 <span class="req">必須</span></div>
+      <textarea class="text-input" id="field-message" maxlength="2000" placeholder="内容をご記入ください" required></textarea>
+
+      <div id="error-note">送信できませんでした。時間をおいて再度お試しください。</div>
+      <button type="submit" class="primary-btn" id="submit-btn">送信する</button>
+    </form>
+
+    <div id="success-card">
+      <div class="icon">✅</div>
+      <h2>送信しました</h2>
+      <p>お問い合わせありがとうございます。内容を確認のうえ、必要に応じてご返信いたします。</p>
+    </div>
   </div>
 
   <p style="font-size:12.5px; color:var(--text-dim);">
-    ※ 上記メールアドレスは仮の記載です。公開前に、実際に受信できるご自身のメールアドレスに置き換えてください。
-    Googleフォームなど別の受付方法を使いたい場合は、このボタンをフォームへのリンクに差し替えることもできます。
-  </p>
-
-  <p style="margin-top:24px; font-size:13px; color:var(--text-dim);">
-    ご連絡の内容によっては、返信までお時間をいただく場合や、返信をお約束できない場合がございます。あらかじめご了承ください。
+    ※ 送信内容はGoogleフォーム経由でスプレッドシートに記録されます。取り扱いについては
+    <a href="./privacy.html">プライバシーポリシー</a>をご確認ください。
   </p>
 
   <footer>
     &copy; IRON LOG
   </footer>
 </div>
+
+<!-- Google Forms への裏送信用（画面遷移なし） -->
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+<form id="gform" action="https://docs.google.com/forms/d/e/1FAIpQLSeCFppvq6aV9TTbHpTfmSrUy1RdGFKv-8Q32Mp96wC_O1Tbxw/formResponse"
+      method="POST" target="hidden_iframe" style="display:none;">
+  <input type="text" name="entry.87449275" id="gform-name">
+  <input type="text" name="entry.2114722056" id="gform-email">
+  <input type="text" name="entry.4301811" id="gform-message">
+</form>
+
+<script>
+(function(){
+  const form = document.getElementById('contact-form');
+  const gform = document.getElementById('gform');
+  const iframe = document.getElementById('hidden_iframe');
+  const submitBtn = document.getElementById('submit-btn');
+  const errorNote = document.getElementById('error-note');
+  let awaitingSubmit = false;
+
+  // The hidden iframe's load event fires once the POST to Google Forms completes
+  // (a plain form-target-iframe post doesn't expose a real success/failure status).
+  iframe.addEventListener('load', function(){
+    if(!awaitingSubmit) return;
+    awaitingSubmit = false;
+    form.style.display = 'none';
+    document.getElementById('success-card').style.display = 'block';
+  });
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    const message = document.getElementById('field-message').value.trim();
+    if(!message){
+      document.getElementById('field-message').focus();
+      return;
+    }
+    errorNote.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.textContent = '送信中…';
+
+    document.getElementById('gform-name').value = document.getElementById('field-name').value.trim();
+    document.getElementById('gform-email').value = document.getElementById('field-email').value.trim();
+    document.getElementById('gform-message').value = message;
+
+    awaitingSubmit = true;
+    gform.submit();
+
+    // Fallback: if the iframe load event doesn't fire for some reason, still
+    // show a result after a few seconds instead of leaving the button stuck.
+    setTimeout(function(){
+      if(awaitingSubmit){
+        awaitingSubmit = false;
+        form.style.display = 'none';
+        document.getElementById('success-card').style.display = 'block';
+      }
+    }, 4000);
+  });
+})();
+</script>
 </body>
 </html>
-
