@@ -1,1 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>使い方ガイド｜IRON LOG — シンプルなトレーニング記録アプリ</title>
+<meta name="description" content="IRON LOGの使い方ガイド。部位選択から種目記録、カレンダー確認、有酸素・ストレッチ・自由入力の使い方まで、トレーニング記録を続けるコツもあわせて解説します。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#111217; --surface:#1B1D24; --surface-2:#242730;
+    --accent:#FF5A36; --accent-2:#FFC93D;
+    --text:#F2F1EC; --text-dim:#9AA0AA; --line:#33363F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Inter',-apple-system,sans-serif; line-height:1.9;
+  }
+  .wrap{max-width:680px; margin:0 auto; padding:28px 20px 60px;}
+  header{display:flex; align-items:center; gap:10px; margin-bottom:8px;}
+  .plate{width:10px;height:10px;border-radius:50%; background:var(--accent); flex-shrink:0;}
+  h1{font-family:'Bebas Neue',sans-serif; font-size:30px; letter-spacing:0.04em; margin:0;}
+  nav{
+    display:flex; flex-wrap:wrap; gap:10px 18px; margin:22px 0 34px;
+    padding-bottom:18px; border-bottom:1px solid var(--line);
+    font-size:13.5px;
+  }
+  nav a{color:var(--text-dim); text-decoration:none; font-weight:600;}
+  nav a:hover{color:var(--accent-2);}
+  h2{font-family:'Bebas Neue',sans-serif; font-size:23px; letter-spacing:0.03em; margin:38px 0 12px; color:var(--accent-2);}
+  h3{font-size:16px; font-weight:800; margin:20px 0 8px; color:var(--text);}
+  p{font-size:15px; color:var(--text); margin:0 0 14px;}
+  ul, ol{margin:0 0 14px; padding-left:22px;}
+  li{font-size:15px; margin-bottom:7px;}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:16px;}
+  .step{
+    display:flex; gap:12px; margin-bottom:14px; align-items:flex-start;
+  }
+  .step .num{
+    width:26px; height:26px; border-radius:50%; background:var(--accent); color:#1a0d08;
+    font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .cta{
+    display:inline-block; background:var(--accent); color:#1a0d08; font-weight:800;
+    padding:13px 22px; border-radius:12px; text-decoration:none; margin-top:10px;
+  }
+  footer{margin-top:50px; padding-top:20px; border-top:1px solid var(--line); font-size:12.5px; color:var(--text-dim);}
+  a{color:var(--accent-2);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="plate"></div>
+    <h1>IRON LOG</h1>
+  </header>
+  <nav>
+    <a href="./index.html">トップ（アプリを開く）</a>
+    <a href="./guide.html">使い方ガイド</a>
+    <a href="./about.html">このサイトについて</a>
+    <a href="./privacy.html">プライバシーポリシー</a>
+    <a href="./contact.html">お問い合わせ</a>
+  </nav>
+
+  <p>
+    IRON LOGは、インストール不要でブラウザからすぐに使えるシンプルなトレーニング記録アプリです。
+    このページでは、基本的な使い方と、記録を長く続けるためのちょっとしたコツを紹介します。
+  </p>
+
+  <h2>基本の記録方法</h2>
+  <div class="card">
+    <div class="step"><div class="num">1</div><p style="margin:0;">カレンダー画面右下の「＋」ボタンをタップします。</p></div>
+    <div class="step"><div class="num">2</div><p style="margin:0;">胸・背中・脚・肩・腕・腹・ヒップ・有酸素・エクササイズ・ストレッチ・自由入力の中から、鍛えた部位を選びます。</p></div>
+    <div class="step"><div class="num">3</div><p style="margin:0;">種目をアイコン付きの一覧から選びます。リストにない種目は「種目を追加」から自分で登録できます。</p></div>
+    <div class="step"><div class="num">4</div><p style="margin:0;">テンキーで重量・回数（種目によっては時間・距離など）を入力し、セットを記録します。</p></div>
+    <div class="step"><div class="num">5</div><p style="margin:0;">記録が終わったら「カレンダーに記録する」で保存。あとはカレンダーの日付をタップすればいつでも見返せます。</p></div>
+  </div>
+
+  <h2>部位ごとの使い分け</h2>
+  <h3>筋トレ種目（胸・背中・脚・肩・腕・腹・ヒップ）</h3>
+  <p>
+    それぞれの部位に、バーベル・ダンベル・マシン／ケーブル・自重を使った代表的な種目があらかじめ用意されています。
+    重量とレップ数を入力するだけなので、ジムでの記録にも自宅トレーニングにも使いやすい形式です。
+  </p>
+  <h3>有酸素</h3>
+  <p>
+    トレッドミル・エアロバイク・クロストレーナーなど、時間・速度・傾斜・負荷レベルといった有酸素運動特有の項目を記録できます。
+    ウォーキングやランニングの習慣を可視化したい方にもおすすめです。
+  </p>
+  <h3>ストレッチ・エクササイズ・自由入力</h3>
+  <p>
+    ヨガのようにあらかじめ用意された種目もありますが、これらのカテゴリの一番の特徴は「種目名も記録項目も自分で自由に決められる」ことです。
+    ウェイトトレーニングの枠に収まらない運動（登山、格闘技の練習、自宅でのストレッチメニューなど）も、
+    「距離」「心拍数」「時間」など好きな項目を組み合わせて記録できます。
+  </p>
+
+  <h2>記録を長く続けるための3つのコツ</h2>
+  <ol>
+    <li>
+      <strong>完璧に記録しようとしない。</strong>
+      種目名とざっくりの重量・回数だけでも、続けることで見えてくるものがあります。細かいメモは気が向いたときで十分です。
+    </li>
+    <li>
+      <strong>「今日は何を鍛える？」欄を使う。</strong>
+      日付ごとに一言メモを残せる機能があります。「胸の日」「軽め」など、あとで見返したときに一目でわかる言葉を入れておくと、振り返りがぐっと楽になります。
+    </li>
+    <li>
+      <strong>過去の記録と比べる。</strong>
+      同じ種目を続けていると、重量やセット数の変化が自然と積み重なっていきます。数字の推移そのものが、次のトレーニングのモチベーションになります。
+    </li>
+  </ol>
+
+  <h2>データの保存について</h2>
+  <p>
+    IRON LOGに入力した記録は、サーバーではなくご利用の端末内（ブラウザのIndexedDB）に保存されます。
+    そのため、記録の内容が外部に送信されることはありません。詳しくは
+    <a href="./privacy.html">プライバシーポリシー</a>をご覧ください。
+  </p>
+
+  <p style="margin-top:30px;">
+    <a class="cta" href="./index.html">アプリを開く →</a>
+  </p>
+
+  <footer>
+    &copy; IRON LOG
+  </footer>
+</div>
+</body>
+</html>
 
