@@ -1,1 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>このサイトについて｜IRON LOG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#111217; --surface:#1B1D24; --surface-2:#242730;
+    --accent:#FF5A36; --accent-2:#FFC93D;
+    --text:#F2F1EC; --text-dim:#9AA0AA; --line:#33363F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Inter',-apple-system,sans-serif; line-height:1.85;
+  }
+  .wrap{max-width:680px; margin:0 auto; padding:28px 20px 60px;}
+  header{display:flex; align-items:center; gap:10px; margin-bottom:8px;}
+  .plate{width:10px;height:10px;border-radius:50%; background:var(--accent); flex-shrink:0;}
+  h1{font-family:'Bebas Neue',sans-serif; font-size:30px; letter-spacing:0.04em; margin:0;}
+  nav{
+    display:flex; flex-wrap:wrap; gap:10px 18px; margin:22px 0 34px;
+    padding-bottom:18px; border-bottom:1px solid var(--line);
+    font-size:13.5px;
+  }
+  nav a{color:var(--text-dim); text-decoration:none; font-weight:600;}
+  nav a:hover{color:var(--accent-2);}
+  h2{font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.03em; margin:34px 0 12px; color:var(--accent-2);}
+  p{font-size:15px; color:var(--text); margin:0 0 14px;}
+  ul{margin:0 0 14px; padding-left:20px;}
+  li{font-size:15px; margin-bottom:6px;}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:18px;}
+  .fill{color:var(--accent-2); font-weight:700;}
+  footer{margin-top:50px; padding-top:20px; border-top:1px solid var(--line); font-size:12.5px; color:var(--text-dim);}
+  a{color:var(--accent-2);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="plate"></div>
+    <h1>IRON LOG</h1>
+  </header>
+  <nav>
+    <a href="./index.html">トップ（アプリを開く）</a>
+    <a href="./guide.html">使い方ガイド</a>
+    <a href="./about.html">このサイトについて</a>
+    <a href="./privacy.html">プライバシーポリシー</a>
+    <a href="./contact.html">お問い合わせ</a>
+  </nav>
+
+  <h2>IRON LOGとは</h2>
+  <p>
+    IRON LOGは、スマートフォンのブラウザだけで完結するシンプルなウェイトトレーニング記録アプリです。
+    部位を選び、種目を選び、テンキーで重量とレップ数を入力するだけで、カレンダー上にその日のトレーニング内容が自動で記録されます。
+    アプリのインストールは不要で、ホーム画面に追加すればアプリのように起動できます（PWA）。
+  </p>
+  <p>
+    筋トレの種目だけでなく、有酸素運動（トレッドミル・エアロバイクなど）、ストレッチ、
+    さらにはユーザー自身が項目を自由に定義できる「自由入力」カテゴリにも対応しており、
+    ウェイトトレーニングに限らず幅広い運動の記録に使っていただけます。
+  </p>
+
+  <h2>主な機能</h2>
+  <div class="card">
+    <ul>
+      <li>部位選択 → 種目選択 → テンキー入力、というシンプルな操作フロー</li>
+      <li>カレンダーで過去の記録を一覧・編集・削除</li>
+      <li>ユーザーが種目や記録項目を自由に追加・編集できるカスタム種目機能</li>
+      <li>セットごとのメモ、その日のテーマを書ける「今日は何を鍛える？」欄</li>
+      <li>インターバル用のタイマー機能（アラーム音の選択・通知にも対応）</li>
+      <li>ダーク／ライト／カラフルの3種類の配色から選択可能</li>
+      <li>記録データはすべて端末内（IndexedDB）に保存され、サーバーには送信されません</li>
+    </ul>
+  </div>
+
+  <h2>運営者情報</h2>
+  <div class="card">
+    <p>サイト名：IRON LOG</p>
+    <p>運営者：<span class="fill">［ここに運営者名またはハンドルネームを記載してください］</span></p>
+    <p>運営形態：個人運営</p>
+    <p>お問い合わせ：<a href="./contact.html">お問い合わせページ</a>よりご連絡ください</p>
+  </div>
+  <p style="font-size:12.5px; color:var(--text-dim);">
+    ※ 上記の運営者名は仮の記載です。公開前に実際の名前・屋号・連絡先情報に置き換えてください。
+  </p>
+
+  <footer>
+    &copy; IRON LOG
+  </footer>
+</div>
+</body>
+</html>
 
