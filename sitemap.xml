@@ -11,6 +11,31 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://tkdjw3295-blip.github.io/blog.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tkdjw3295-blip.github.io/blog-beginner-menu.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tkdjw3295-blip.github.io/blog-cardio-diet.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tkdjw3295-blip.github.io/blog-stretching-timing.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tkdjw3295-blip.github.io/blog-tracking-motivation.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://tkdjw3295-blip.github.io/about.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
