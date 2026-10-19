@@ -35,6 +35,50 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --ad-clearance: 84px;
   }
+     <style>
+
+  :root{
+    --bg:#111217;
+    --surface:#1B1D24;
+    --surface-2:#242730;
+    --surface-3:#2E313C;
+    --accent:#FF5A36;
+    --accent-dim:#4A2A20;
+    --accent-2:#FFC93D;
+    --text:#F2F1EC;
+    --text-dim:#8B90A0;
+    --line:#33363F;
+    --danger:#FF5A5A;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --ad-clearance: 84px;
+  }
+
+  /* ▼▼ ここに追加 ▼▼ */
+
+  .app-footer-nav {
+    display: flex;
+    flex-direction: column;   /* ← 縦並びにする */
+    align-items: flex-start;  /* 左寄せ */
+    gap: 10px;                /* 各リンクの間隔 */
+    padding: 20px 0;
+  }
+
+  .app-footer-nav a {
+    display: block;           /* ← 確実に縦に積む */
+    font-size: 16px;
+    text-decoration: none;
+    color: #333;
+  }
+
+  .app-footer-nav span {
+    display: none;            /* 「・」を非表示にする */
+  }
+
+  /* ▲▲ ここまで追加 ▲▲ */
+
+  /* この下に既存のCSSが続く */
+
   /* ---------- Theme: Light ---------- */
   #phone[data-theme="light"]{
     --bg:#F4F5F8;
@@ -1296,17 +1340,14 @@ function renderCalendar(){
       ${cells}
     </div>
     ${recentHtml}
-    <div class="app-footer-nav">
-      <a href="guide.html">使い方</a>
-      <span>・</span>
-      <a href="blog.html">コラム</a>
-      <span>・</span>
-      <a href="about.html">サイトについて</a>
-      <span>・</span>
-      <a href="privacy.html">プライバシー</a>
-      <span>・</span>
-      <a href="contact.html">お問い合わせ</a>
-    </div>
+  <div class="app-footer-nav">
+  <a href="guide.html">使い方</a>
+  <a href="blog.html">コラム</a>
+  <a href="about.html">サイトについて</a>
+  <a href="privacy.html">プライバシー</a>
+  <a href="contact.html">お問い合わせ</a>
+</div>
+
   `;
 
   document.getElementById('prev-month').onclick = ()=>{
